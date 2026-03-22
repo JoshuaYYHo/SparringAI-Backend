@@ -1,0 +1,24 @@
+# Environment variables (secrets!)
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# OS
+.DS_Store
+
+# Temp uploads
+uploads_temp/
+
+# ML model files (large binaries)
+*.pt
+*.pth
+yolov8n_openvino_model/
+
+# Generated analysis results
+*_results.json
+
+# Example videos (too large for git)
+example_videos/
