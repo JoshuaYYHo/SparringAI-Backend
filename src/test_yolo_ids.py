@@ -4,7 +4,7 @@ from ultralytics import YOLO
 
 def check_id_mapping(video_path):
     print(f"Loading YOLO...")
-    model = YOLO("yolov8n.pt")
+    model = YOLO("models/yolov8n.pt")
     cap = cv2.VideoCapture(video_path)
     
     fps = cap.get(cv2.CAP_PROP_FPS)

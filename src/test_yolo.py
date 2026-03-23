@@ -4,7 +4,7 @@ from ultralytics import YOLO
 
 def check_yolo(video_path):
     print(f"Loading YOLO...")
-    model = YOLO("yolov8n.pt") # Fast model for debug
+    model = YOLO("models/yolov8n.pt") # Fast model for debug
     cap = cv2.VideoCapture(video_path)
     
     fps = cap.get(cv2.CAP_PROP_FPS)

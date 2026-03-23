@@ -76,7 +76,7 @@ def get_boxing_class_name(class_id):
     return f"Class {class_id}"
 
 # --- Global Model Loading (for backend efficiency) ---
-MODEL_PATH = os.getenv("BOXING_MODEL_PATH", "best_boxing_model.pth")
+MODEL_PATH = os.getenv("BOXING_MODEL_PATH", "models/best_boxing_model.pth")
 _boxing_model = None
 
 def get_model():
@@ -268,7 +268,7 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
 
     # Load YOLOv8 for Multi-Person BBox Tracking using the compiled OpenVINO format for speed
     print("Loading YOLOv8 object detector...")
-    yolo_model = YOLO('yolov8n_openvino_model') 
+    yolo_model = YOLO('models/yolov8n_openvino_model') 
     
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
@@ -333,7 +333,7 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
         # 1. Run YOLO to get tracked bounding boxes (classes=[0] means only 'person')
         # Optimization 1: Use OpenVINO Compiled format for Apple Silicon hardware acceleration 
         # Stabilization: Use ByteTrack and enforce 0.6 confidence to prevent generic blobs from getting track IDs
-        results = yolo_model.track(frame, persist=True, classes=[0], tracker="bytetrack.yaml", conf=0.6, verbose=False)
+        results = yolo_model.track(frame, persist=True, classes=[0], tracker="config/bytetrack.yaml", conf=0.6, verbose=False)
         
         # We need to calculate distance between fighters if exactly 2 are detected
         boxes = results[0].boxes
@@ -937,7 +937,7 @@ if __name__ == "__main__":
     # Save the results to a JSON file
     video_basename = os.path.basename(test_video)
     video_name, _ = os.path.splitext(video_basename)
-    json_path = f"{video_name}_results.json"
+    json_path = f"results/{video_name}_results.json"
     
     with open(json_path, "w") as f:
         json.dump(punches, f, indent=4)
