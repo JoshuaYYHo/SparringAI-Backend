@@ -5,3 +5,8 @@ python-dotenv
 slowapi
 openai
 google-genai
+opencv-python-headless
+torch
+torchvision
+ultralytics
+mediapipe

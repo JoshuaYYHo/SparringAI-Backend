@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+
+# Environment
+.env
+.env.example
+
+# Example videos (not needed in production image)
+example_videos/
+
+# Results (generated at runtime)
+results/
+
+# Test scripts
+src/test_*.py

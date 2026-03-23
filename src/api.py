@@ -19,8 +19,7 @@ from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Local ML pipeline
-from main import identify_punches_in_video
+from src.main import identify_punches_in_video
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -305,14 +304,17 @@ def _generate_ai_analysis(analysis_data: dict) -> str:
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Sparring AI Backend!"}
+
 @app.get("/health")
 async def health_check():
     """Public health-check endpoint (no auth required)."""
     return {"status": "ok"}
 
-
 @app.post("/video_upload")
-@limiter.limit("5/minute")
+@limiter.limit("1/minute")
 async def video_upload(
     request: Request,
     video: UploadFile = File(..., description="The boxing video file to analyse."),
