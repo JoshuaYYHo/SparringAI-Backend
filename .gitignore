@@ -12,10 +12,7 @@ venv/
 # Temp uploads
 uploads_temp/
 
-# ML model files (large binaries)
-*.pt
-*.pth
-yolov8n_openvino_model/
+
 
 # Generated analysis results
 *_results.json
