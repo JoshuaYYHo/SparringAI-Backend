@@ -1,10 +1,16 @@
 import os
 import sys
+
+# Dynamically bypass broken C++ protobuf bindings on AMD64 Linux (Render) before mediapipe loads
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
 import cv2
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import mediapipe as mp
+# Force explicit import to expose any hidden ImportErrors (e.g., missing libGL) instead of silent failure
+import mediapipe.python.solutions as mp_solutions
 import numpy as np
 from ultralytics import YOLO
 
@@ -285,7 +291,7 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
     # Key: YOLO Track ID, Value: tracking data dict
     fighters_data = {}
     
-    mp_pose = mp.solutions.pose
+    mp_pose = mp_solutions.pose
     
     # We create a small pool of reusable MediaPipe trackers to prevent C++ thread exhaustion
     # instead of creating a new one every time YOLO creates a new track_id
