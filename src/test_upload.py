@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 def test_upload(video_path):
-    url = "http://localhost:8000/video_upload"
+
+    url = os.getenv("PROD_URL")
+    #url = "http://localhost:8000/video_upload"
     api_key = os.getenv("SPARRING_API_KEY")
     
     if not api_key:

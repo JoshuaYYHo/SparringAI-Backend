@@ -268,7 +268,11 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
 
     # Load YOLOv8 for Multi-Person BBox Tracking using the compiled OpenVINO format for speed
     print("Loading YOLOv8 object detector...")
-    yolo_model = YOLO('models/yolov8n_openvino_model') 
+    try:
+        yolo_model = YOLO('models/yolov8n_openvino_model') 
+    except Exception as e:
+        print(f"Warning: Failed to load OpenVINO model ({e}). Falling back to standard PyTorch model.")
+        yolo_model = YOLO('models/yolov8n.pt')
     
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():

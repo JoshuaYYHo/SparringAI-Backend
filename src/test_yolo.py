@@ -13,6 +13,7 @@ def check_yolo(video_path):
     
     cap.set(cv2.CAP_PROP_POS_FRAMES, target_start_frame)
     
+    
     print(f"Checking frames {target_start_frame} to {target_end_frame}")
     print("Format: Frame | Active Tracking IDs (Top 2 size)")
     print("-" * 50)
