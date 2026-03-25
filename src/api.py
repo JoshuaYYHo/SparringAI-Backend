@@ -414,8 +414,10 @@ async def video_upload(
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         logger.exception("Analysis failed")
-        raise HTTPException(status_code=500, detail="Analysis failed. Please try again or contact support.")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}\n\nTraceback:\n{error_details}")
     finally:
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
