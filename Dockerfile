@@ -22,6 +22,10 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Enforce headless OpenCV for MediaPipe to prevent libxcb/libGL silent crashes on Render
+RUN pip uninstall -y opencv-contrib-python opencv-python opencv-python-headless \
+    && pip install --no-cache-dir opencv-python-headless
+
 # Copy the rest of the application code
 COPY . .
 
