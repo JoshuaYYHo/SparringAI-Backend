@@ -93,8 +93,12 @@ def get_model():
             state_dict = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
             _boxing_model.load_state_dict(state_dict)
             _boxing_model.eval()
+            
+            # MEMORY OPTIMIZATION: Disable PyTorch's native backpropagation 
+            # buffers locally to save massive memory reserves, avoiding OOMs
+            torch.set_grad_enabled(False)
         except Exception as e:
-            print(f"Failed to load model: {e}")
+            print(f"Boxing model not loaded: {e}")
             _boxing_model = None
     return _boxing_model
 
@@ -293,9 +297,10 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
     
     # We create a small pool of reusable MediaPipe trackers to prevent C++ thread exhaustion
     # instead of creating a new one every time YOLO creates a new track_id
-    MAX_TRACKERS = 5
+    # MEMORY OPTIMIZATION: Dropped from 5 down to 2, saving 3 huge C++ instance allocations inside the 512MB limit!
+    MAX_TRACKERS = 2
     # Optimization 3: Lowering min_detection_confidence to 0.4 so it relies on the faster internal tracker more
-    pose_trackers = [mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.4, min_tracking_confidence=0.5) for _ in range(MAX_TRACKERS)]
+    pose_trackers = [mp_pose.Pose(static_image_mode=False, model_complexity=0, min_detection_confidence=0.4, min_tracking_confidence=0.5) for _ in range(MAX_TRACKERS)]
     tracker_index = 0
     
     # Optimization 2: Frame Skipping
@@ -341,7 +346,8 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
         # 1. Run YOLO to get tracked bounding boxes (classes=[0] means only 'person')
         # Optimization 1: Use OpenVINO Compiled format for Apple Silicon hardware acceleration 
         # Stabilization: Use ByteTrack and enforce 0.6 confidence to prevent generic blobs from getting track IDs
-        results = yolo_model.track(frame, persist=True, classes=[0], tracker="config/bytetrack.yaml", conf=0.6, verbose=False)
+        # Optimization: Downscale imagery using imgsz=320 so object tracking processes 4x faster per frame
+        results = yolo_model.track(frame, persist=True, classes=[0], tracker="config/bytetrack.yaml", conf=0.6, verbose=False, imgsz=320)
         
         # We need to calculate distance between fighters if exactly 2 are detected
         boxes = results[0].boxes
@@ -503,6 +509,13 @@ def identify_punches_in_video(video_path: str, confidence_threshold: float = 0.8
                 fighter_crop = frame[y1:y2, x1:x2]
                 if fighter_crop.size == 0: continue
                 
+                # OPTIMIZE: Resize extremely large crops to speed up MediaPipe on slow CPUs
+                ch, cw = fighter_crop.shape[:2]
+                max_dim = 256
+                if ch > max_dim or cw > max_dim:
+                    scale = max_dim / max(ch, cw)
+                    fighter_crop = cv2.resize(fighter_crop, (int(cw * scale), int(ch * scale)))
+
                 # 2. Run MediaPipe ON THE CROPPED IMAGE
                 image_rgb = cv2.cvtColor(fighter_crop, cv2.COLOR_BGR2RGB)
                 pose_results = fighter['pose_tracker'].process(image_rgb)

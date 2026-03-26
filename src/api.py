@@ -398,6 +398,12 @@ async def video_upload(
             user_bbox=parsed_bbox,
         )
 
+        # MEMORY OPTIMIZATION: Violently strip out massive OpenCV matrices, PyTorch structures,
+        # and dictionaries left lingering in memory by forcing garbage collection BEFORE handing
+        # the CPU over to the long OpenAI network socket.
+        import gc
+        gc.collect()
+
         logger.info("ML analysis complete. Generating GPT-4o commentary…")
 
         # ── Step 2: Feed JSON into OpenAI for written analysis ───────────
