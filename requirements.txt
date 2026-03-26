@@ -9,6 +9,6 @@ opencv-python-headless
 torch
 torchvision
 ultralytics
-mediapipe
+mediapipe==0.10.14
 openvino
 openvino-telemetry
