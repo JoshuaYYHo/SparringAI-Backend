@@ -4,7 +4,12 @@ FROM python:3.10-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+    PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python \
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    VECLIB_MAXIMUM_THREADS=1 \
+    NUMEXPR_NUM_THREADS=1
 
 # Install system dependencies required for ML packages (like OpenCV)
 RUN apt-get update && apt-get install -y --no-install-recommends \

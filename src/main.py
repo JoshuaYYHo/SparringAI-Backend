@@ -5,7 +5,14 @@ import sys
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
 import cv2
+# MEMORY OPTIMIZATION: Prevent OpenCV from seeing the 128 host cores and allocating 
+# a 128-thread building block pool that instantly crushes the 512MB RAM limit
+cv2.setNumThreads(1)
+
 import torch
+# MEMORY OPTIMIZATION: Prevent PyTorch from parallelizing tensors across 128 host cores
+torch.set_num_threads(1)
+
 import torch.nn as nn
 import torch.nn.functional as F
 import mediapipe as mp
